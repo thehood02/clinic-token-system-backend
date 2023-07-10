@@ -10,46 +10,16 @@ const tokenGenerator = (req, res, next) => {
     .sort({ _id: -1 })
     .limit(1)
     .then((item) => {
-      console.log(item);
       if (item[0]?.tokenId) {
-        console.log("hi");
-        const prevToken = parseInt(item[0].tokenId.match(/\d+/)[0]);
-        const tokenNumber = prevToken + 1;
-        res.locals.newToken = "T-" + tokenNumber;
-        console.log("tochan", res.locals.newToken);
+        const previousTokenNumber = parseInt(item[0].tokenId.match(/\d+/)[0]);
+        const newTokenNumber = previousTokenNumber + 1;
+        res.locals.newToken = "T-" + newTokenNumber;
       }
       next();
     });
 };
 
-router.get("/getAllTokens", (req, res) => {
-    res.send("get all api");
-    res.end();
-});
-
-router.get("/getCurrentToken", (req, res) => {
-  res.send("get api");
-  res.end();
-})
-
 router.post("/createToken", tokenGenerator, async (req, res) => {
-
-  // let newToken = "T-101";
-
-  // Model.find({})
-  //   .sort({ _id: -1 })
-  //   .limit(1)
-  //   .then((item) => {
-  //     console.log(item);
-  //     if (item[0]?.tokenId) {
-  //       console.log("hi")
-  //       const prevToken = parseInt(item[0].tokenId.match(/\d+/)[0]);
-  //       const tokenNumber = prevToken + 1;
-  //       newToken = "T-" + tokenNumber
-  //       console.log("tochan",newToken);
-  //     }
-  //   });
-
 
   const data = new Model({
     name: req.body.name,
@@ -58,8 +28,6 @@ router.post("/createToken", tokenGenerator, async (req, res) => {
     tokenId: res.locals.newToken
   })
 
-  console.log("data", data)
-
   try {
     const dataToSave = await data.save();
     res.status(200).json(dataToSave);
@@ -67,6 +35,20 @@ router.post("/createToken", tokenGenerator, async (req, res) => {
     res.status(400).json({message: error.message});
   }
 })
+
+router.get("/getAllTokens", async (req, res) => {
+  try {
+    const data = await Model.find();
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+});
+
+router.get("/getCurrentToken", (req, res) => {
+  res.send("get api");
+  res.end();
+});
 
 router.get("/getNextToken", (req, res) => {
   res.send("update api");
