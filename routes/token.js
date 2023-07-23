@@ -45,12 +45,32 @@ router.get("/getAllTokens", async (req, res) => {
   }
 });
 
-router.get("/getCurrentToken", (req, res) => {
-  res.send("get api");
-  res.end();
+router.get("/getCurrentToken", async (req, res) => {
+  try {
+    const data = await Model.findOne({"status": "current"});
+    // console.log(data);
+    if (data == null) {
+      res.status(404).json({message: "No current token found"});
+    }
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
 });
 
 router.get("/getNextToken", (req, res) => {
+  // check if there is a current token
+    // if there is a current token
+      // update it as complete
+      // check if there is a next token
+        // if there is a next token
+          // make the next token as current
+          // return the new token
+        // else if there is no next token
+          // send message that no tokens left 
+    // else if there is not a current token
+      // make the very 1st token as current
+      // return the token
   res.send("update api");
   res.end();
 })
