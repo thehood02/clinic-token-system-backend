@@ -19,7 +19,7 @@ const tokenGenerator = (req, res, next) => {
     });
 };
 
-router.post("/createToken", tokenGenerator, async (req, res) => {
+router.post("/create", tokenGenerator, async (req, res) => {
 
   const data = new Model({
     name: req.body.name,
@@ -36,7 +36,7 @@ router.post("/createToken", tokenGenerator, async (req, res) => {
   }
 })
 
-router.get("/getAllTokens", async (req, res) => {
+router.get("/getAll", async (req, res) => {
   try {
     const data = await Model.find();
     res.status(200).json(data);
@@ -45,12 +45,12 @@ router.get("/getAllTokens", async (req, res) => {
   }
 });
 
-router.get("/getCurrentToken", async (req, res) => {
+router.get("/getCurrent", async (req, res) => {
   try {
     const data = await Model.findOne({"status": "current"});
     // console.log(data);
     if (data == null) {
-      res.status(404).json({message: "No current token found"});
+      res.status(404).json({message: "No token found"});
     }
     res.json(data);
   } catch (error) {
@@ -58,7 +58,12 @@ router.get("/getCurrentToken", async (req, res) => {
   }
 });
 
-router.get("/getNextToken", (req, res) => {
+router.post("/next", async (req, res) => {
+
+  // TODO: check if thera are any tokens at all, probably will check it in the condition that there is no current token
+  // can I do it like: find the item after an item whose property status is current, then get next item and update that item, then update the very first item whose status is current and make it as complete?
+  // other option: update the current as done, find the very first item with waiting status and update that as current
+
   // check if there is a current token
     // if there is a current token
       // update it as complete
@@ -71,9 +76,32 @@ router.get("/getNextToken", (req, res) => {
     // else if there is not a current token
       // make the very 1st token as current
       // return the token
-  res.send("update api");
-  res.end();
+  try {
+  //   const data = await Model.findOne({"status": "current"});
+  //   // console.log(data);
+  //   if (data !== null) {
+  //   } else {
+      const firstToken = await Model.findOneAndUpdate({"status": "current"}, {"status": "complete"});
+      console.log(firstToken);
+      if (firstToken == null) {
+        const updateFirstToken = await Model.findOneAndUpdate({}, {"status": "current"})
+        if (updateFirstToken !== null) {
+          res.send(200).json({"message": "Token Updated"})
+        } else {
+          res.send(200).json({"message": "No Token Found"});
+          res.end();
+        }
+      } else {
+        const firstWaitingToken = await Model.findOneAndUpdate({"status": "waiting"}, {"status": "current"});
+        console.log(firstWaitingToken);
+      }
+      
+    // }
+    res.send("update api");
+    res.end();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 })
-
 
 module.exports = router;

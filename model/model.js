@@ -11,7 +11,7 @@ const dataSchema = new mongoose.Schema({
   },
   status: {
     required: false,
-    type: String, // waiting, current, complete
+    type: String, // wait, current, complete
   },
   tokenId: {
     required: false,
