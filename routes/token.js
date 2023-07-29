@@ -92,9 +92,9 @@ router.post("/next", async (req, res) => {
       );
       console.log(firstWaitingToken);
       if (firstWaitingToken !== null) {
-        res.send(200).json({ message: "Token Updated" });
+        res.status(200).json({ message: "Token Updated" });
       } else {
-        res.send(200).json({ message: "No Token Left" });
+        res.status(200).json({ message: "No Token Left" });
       }
     } else {
       const firstToken = await Model.findOneAndUpdate(
@@ -103,9 +103,9 @@ router.post("/next", async (req, res) => {
       );
       console.log(firstToken);
       if (firstToken !== null) {
-        res.send(200).json({ message: "Token Updated" });
+        res.status(200).json({ message: "Token Updated" });
       } else {
-        res.send(200).json({ message: "No Token Left" });
+        res.status(200).json({ message: "No Token Left" });
       }
     }
 
